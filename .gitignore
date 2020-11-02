@@ -2,6 +2,7 @@ my_settings.py
 *.csv
 .DS_Store
 db_uploader.py
+.vscode
 
 # Created by https://www.toptal.com/developers/gitignore/api/windows,django,vscode
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,django,vscode
