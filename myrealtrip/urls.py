@@ -1,5 +1,4 @@
 """myrealtrip URL Configuration
-
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.1/topics/http/urls/
 Examples:
@@ -17,11 +16,9 @@ from django.urls import path, include
 
 urlpatterns = [
     # 항공권 페이지
-
+    path("air",include("flight.urls")),
     # 호텔 페이지
     path('accommodations', include('hotel.urls')),
     # 로그인/회원가입
     path('users', include('user.urls'))
-
-
 ]
