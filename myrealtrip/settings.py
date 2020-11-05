@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'user',
     'hotel',
     'flight',
+    'review'
 ]
 
 SITE_ID = 1
@@ -71,6 +72,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
+
+APPEND_SLASH = False
 
 ROOT_URLCONF = 'myrealtrip.urls'
 
