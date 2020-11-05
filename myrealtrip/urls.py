@@ -19,6 +19,7 @@ urlpatterns = [
     path("air",include("flight.urls")),
     # 호텔 페이지
     path('accommodations', include('hotel.urls')),
+    path('reviews', include('review.urls')),
     # 로그인/회원가입
     path('users', include('user.urls'))
 ]
