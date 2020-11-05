@@ -1,60 +1,146 @@
 import json
+import decimal
 
-from django.http import JsonResponse
-from django.views import View
+from django.http      import JsonResponse
+from django.views     import View
+from django.db.models import Max
 
 from hotel.models import Region, City, Hotel, Option, HotelOption, HotelImage, Convenience, HotelConvenience, Theme, HotelTheme
 # Create your views here.
 
 class HotelListView(View):
-    # def get(self, request):
-    #     region_id = request.GET.get('region', None)
-    #     city_id = request.GET.get('city', None)
-
-    #     if city_id:
-    #         filter_condition = {'city_id': city_id}
-    #     elif region_id:
-    #         cities = City.objects.filter(region_id = region_id)
-    #         filter_condition = {'cities' : cities}
-    #     else:
-    #         filter_condition = {'city_id': 1}
-
-        
-    #     hotel_list = Hotel.objects.filter(**filter_condition).values()
-
-    #     data = [hotel for hotel in hotel_list]
 
     def get(self, request):
-        category_id = request.GET.get('category', None)
-        subcategory = request.GET.get('location', None)
+        try:
+        # 변수
+            if not request.GET._mutable:
+                request.GET._mutable = True
 
-        if category_id == 2:
-            if location:
-                filter_condition = {'location': city_id}
-            else:
-                filter_condition = {'location': 1}
-        elif category_id == 1:
-            if location:
-                cities = City.objecst.filter(region_id = region_id)
-                filter_condition = {'location': cities}
-            else:
-                filter_condition = {'location': 1}
-        else:
-            filter_condition = {'location': 1}
+            filter_conditions = dict(request.GET)
+            limit             = 10
+            offset            = int(filter_conditions.get('offset', 0))
+            order_by          = filter_conditions.get('order_by', None)
 
-        
-        hotel_list = Hotel.objects.filter(**filter_condition).values()
-        data = [hotel for hotel in hotel_list]
+        # 필터
+
+            # 등급 필터
+            if filter_conditions.get('star'):
+                filter_conditions["star__in"] = filter_conditions.pop('star')
+
+            # 가격 필터
+            if filter_conditions.get('min_price'):
+                minimum = int(filter_conditions.get('min_price'))
+            else:
+                minimum = 0
+            if filter_conditions.get('max_price'):
+                maximum = int(filter_conditions.get('max_price'))
+            else:
+                maximum = int(Hotel.objects.all().aggregate(Max('basic_price'))['basic_price__max'])
+            filter_conditions["basic_price__range"] =  (minimum, maximum)
+
+             # 서비스 필터
+            if filter_conditions.get('convenience'):
+                hotels = list(set([
+                    hotel['hotel_id'] 
+                    for hotel 
+                    in HotelConvenience.objects.filter(
+                        convenience_id = filter_conditions.get('convenience')[0]
+                        ).values()
+                        ]))
+                del filter_conditions['convenience']
+                filter_conditions["id__in"] = hotels
+
+
+            # 테마 필터
+            if filter_conditions.get('theme'):
+                hotels = [
+                    hotel['hotel_id'] 
+                    for hotel 
+                    in HotelTheme.objects.filter(theme_id = filter_conditions.get('theme')[0]
+                    ).values()
+                ]
+                del filter_conditions['theme']
+                filter_conditions["id__in"] = hotels
+
+            # 지역 필터
+            if filter_conditions.get('city'):
+                filter_conditions['city']    = filter_conditions.get('city')[0]
+                filter_conditions['city_id'] = filter_conditions.pop('city')
+
+
+            if filter_conditions.get('region'):
+                cities = City.objects.filter(region_id = filter_conditions.get('region')[0])
+                filter_conditions['city__in'] = cities
+                del filter_conditions['region']
+
+            if (filter_conditions.get('city_id') == None) and (filter_conditions.get('city__in') == None):
+                filter_conditions['city_id'] = 1
+            
+
+            if filter_conditions.get('order_by'):
+                sorting = {
+                'star': '-star',
+                'price_high':'-basic_price',
+                'price_low' : 'basic_price'
+                }
+                order_by = filter_conditions.get('order_by')[0]
+                del filter_conditions['order_by']
+                filtered_hotel = Hotel.objects.filter(**filter_conditions).order_by(sorting[order_by]).values()
     
-                
+            else:
+                filtered_hotel = Hotel.objects.filter(**filter_conditions).values()
 
-        return JsonResponse(
-            {
-                "hotels":data
+            total_hotels = len(filtered_hotel)
+
+            if offset > len(filtered_hotel):
+                return JsonResponse({
+                    "message": "Offset out of range"
+                })
+            
+            hotel_list = [hotel for hotel in filtered_hotel][offset:offset+limit]
+
+            returning_list = []
+
+            for hotel in hotel_list:
+                returning_dict = {}
+                returning_dict['id']        = hotel['id']
+                returning_dict['name']      = hotel['name']
+                returning_dict['thumbnail'] = hotel['thumbnail_url']
+                returning_dict['price']     = hotel['basic_price']
+                returning_dict['star']      = hotel['star']
+                returning_list.append(returning_dict)
+
+            return JsonResponse(
+                {
+                    "hotels":returning_list,
+                    "total_hotels":total_hotels
+                },
+                status=200
+                )
+
+        except ValueError:
+            return JsonResponse(
+                {
+                    "message": "Given input is not valid"
+                }
+            )
+
+
+class HotelDetailView(View):
+    def get(self, request, hotel_id):
+        hotel_detail       = Hotel.objects.filter(id = hotel_id).values()[0]
+        hotel_images       = [image['image_url'] for image in HotelImage.objects.filter(hotel_id = hotel_id).values()]
+        hotel_conveniences = [conv['convenience_id'] for conv in HotelConvenience.objects.filter(hotel_id = hotel_id).values()]
+        
+        hotel_conveniences_list = []
+        for conv in hotel_conveniences:
+            target_con = Convenience.objects.filter(id = conv).values()[0]
+            hotel_conveniences_list.append(target_con)
+
+        return JsonResponse({
+            'hotel_detail'      : hotel_detail,
+            'hotel_images'      : hotel_images,
+            'hotel_conveniences': hotel_conveniences_list
             },
             status=200
         )
-
-
-
-        
