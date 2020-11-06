@@ -138,6 +138,8 @@ class HotelDetailView(View):
         hotel_images       = [image['image_url'] for image in HotelImage.objects.filter(hotel_id = hotel_id).values()]
         hotel_conveniences = [conv['convenience_id'] for conv in HotelConvenience.objects.filter(hotel_id = hotel_id).values()]
         
+
+
         hotel_conveniences_list = []
         for conv in hotel_conveniences:
             target_con = Convenience.objects.filter(id = conv).values()[0]
