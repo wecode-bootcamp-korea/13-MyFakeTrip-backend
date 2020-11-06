@@ -5,7 +5,7 @@ from django.http      import JsonResponse
 from django.views     import View
 from django.db.models import Max
 
-from hotel.models import Region, City, Hotel, Option, HotelOption, HotelImage, Convenience, HotelConvenience, Theme, HotelTheme
+from hotel.models     import Region, City, Hotel, Option, HotelOption, HotelImage, Convenience, HotelConvenience, Theme, HotelTheme
 # Create your views here.
 
 class HotelListView(View):
@@ -18,11 +18,20 @@ class HotelListView(View):
 
             filter_conditions = dict(request.GET)
             limit             = 10
-            offset            = int(filter_conditions.get('offset', 0))
-            order_by          = filter_conditions.get('order_by', None)
+
+            if filter_conditions.get('offset'):
+                offset = filter_conditions['offset'][0]
+                del filter_conditions['offset']
+            else:
+                offset = 0
+
+            if filter_conditions.get('order_by'):
+                order_by = filter_conditions.get('order_by')[0]
+                del filter_conditions['order_by']
+            else:
+                order_by = None
 
         # 필터
-
             # 등급 필터
             if filter_conditions.get('star'):
                 filter_conditions["star__in"] = filter_conditions.pop('star')
@@ -63,11 +72,6 @@ class HotelListView(View):
                 filter_conditions["id__in"] = hotels
 
             # 지역 필터
-            if filter_conditions.get('city'):
-                filter_conditions['city']    = filter_conditions.get('city')[0]
-                filter_conditions['city_id'] = filter_conditions.pop('city')
-
-
             if filter_conditions.get('region'):
                 cities = City.objects.filter(region_id = filter_conditions.get('region')[0])
                 filter_conditions['city__in'] = cities
@@ -77,14 +81,12 @@ class HotelListView(View):
                 filter_conditions['city_id'] = 1
             
 
-            if filter_conditions.get('order_by'):
+            if order_by != None:
                 sorting = {
                 'star': '-star',
                 'price_high':'-basic_price',
                 'price_low' : 'basic_price'
                 }
-                order_by = filter_conditions.get('order_by')[0]
-                del filter_conditions['order_by']
                 filtered_hotel = Hotel.objects.filter(**filter_conditions).order_by(sorting[order_by]).values()
     
             else:
@@ -144,11 +146,17 @@ class HotelDetailView(View):
         for conv in hotel_conveniences:
             target_con = Convenience.objects.filter(id = conv).values()[0]
             hotel_conveniences_list.append(target_con)
+        hotel_conveniences_list = [
+            Convenience.objects.filter(id = conv).values()[0] for conv in hotel_conveniences
+        ]
+
+        hotel_add_prices = [option['additional_price'] for option in HotelOption.objects.filter(hotel_id=hotel_id).values()]
 
         return JsonResponse({
             'hotel_detail'      : hotel_detail,
             'hotel_images'      : hotel_images,
-            'hotel_conveniences': hotel_conveniences_list
+            'hotel_conveniences': hotel_conveniences_list,
+            'hotel_add_prices'  : hotel_add_prices
             },
             status=200
         )
