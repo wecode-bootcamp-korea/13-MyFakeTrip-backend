@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'hotel',
     'flight',
     'review',
+    'hotel_booking'
     'flight_checkout'
 ]
 

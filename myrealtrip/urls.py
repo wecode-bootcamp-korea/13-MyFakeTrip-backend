@@ -21,6 +21,8 @@ urlpatterns = [
     path('air/booking', include('flight_checkout.urls')),
     # 호텔 페이지
     path('accommodations', include('hotel.urls')),
+    # 호텔 예약 페이지
+    path('accommodations/booking', include('hotel_booking.urls')),
     path('reviews', include('review.urls')),
     # 로그인/회원가입
     path('users', include('user.urls'))
