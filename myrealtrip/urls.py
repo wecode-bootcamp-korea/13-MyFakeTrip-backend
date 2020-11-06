@@ -16,5 +16,12 @@ Including another URLconf
 from django.urls import path, include
 
 urlpatterns = [
-    path('accommodations', include('hotel.urls'))
+    # 항공권 페이지
+
+    # 호텔 페이지
+    path('accommodations', include('hotel.urls')),
+    # 로그인/회원가입
+    path('users', include('user.urls'))
+
+
 ]
