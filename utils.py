@@ -15,13 +15,13 @@ def signin_decorator(func):
     def wrapper(self, request, *args, **kwargs):
         try:
             token     = request.headers.get('Authorization', None)
-            key       = my_settings.SECRET.get('JWT_KEY')
+            key       = my_settings.SECRET.get('SECRET_KEY')
             algorithm = my_settings.SECRET.get('JWT_ALGORITHM')
 
             if token == None:
                 return JsonResponse({"message" : "TOKEN_DOES_NOT_EXIST"}, status=403)
             
-            decode       = jwt.decode(token, key, algorithms = algorithm)
+            decode       = jwt.decode(token, key, algorithm = algorithm)
             user         = User.objects.get(id=decode['user'])
             request.user = user
 
