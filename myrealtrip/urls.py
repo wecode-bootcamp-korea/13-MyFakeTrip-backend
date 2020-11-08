@@ -17,6 +17,8 @@ from django.urls import path, include
 urlpatterns = [
     # 항공권 페이지
     path("air",include("flight.urls")),
+    # 항공권 예약 페이지
+    path('air/booking', include('flight_checkout.urls')),
     # 호텔 페이지
     path('accommodations', include('hotel.urls')),
     path('reviews', include('review.urls')),
