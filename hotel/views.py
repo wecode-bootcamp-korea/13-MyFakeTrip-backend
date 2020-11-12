@@ -110,10 +110,16 @@ class HotelListView(View):
                 returning_dict['star']      = hotel['star']
                 returning_list.append(returning_dict)
 
+        # 지역 필터 모달..........
+            region_list = Region.objects.all().values()
+            city_list = City.objects.all().values()
+
             return JsonResponse(
                 {
                     "hotels":returning_list,
-                    "total_hotels":total_hotels
+                    "total_hotels":total_hotels,
+                    "region" :[region['name'] for region in region_list],
+                    "city" : [city['name'] for city in city_list]
                 },
                 status=200
                 )
