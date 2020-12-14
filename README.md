@@ -11,11 +11,11 @@
 
 ### 주요기능
 
--
--
--
--
--
+- 카카오 소셜 로그인을 이용한 로그인 구현
+- 항공권 목록, 선택, 구매로로 이어지는 flow 구현
+- 호텔 목록, 호텔 상세페이지, 구매로 이어지는 flow 구현
+- 항공권 및 호텔 목록에서 조건에 따른 filtering 구현
+- Redux를 이용한 JWT 관리
 
 ## 기술스택
 
@@ -44,13 +44,11 @@
 - Postman
 - Git & Github
 
-### 추가설치 라이브러리
-
--
-
 ## 영상 및 화면
 
 - 메인 화면
+![myfaketrip main capture](https://user-images.githubusercontent.com/66218824/102047992-9e8fd000-3e21-11eb-9dd2-f0db8a3ebefe.png)
+
 
 - 유튜브: https://youtu.be/G8wdZMn2BhU
 
@@ -66,7 +64,6 @@
 1. Styled Component 사용을 통한 스타일링 구현
 2. URL parameters(queryString)를 이용한 동적 라우팅 구현
 3. REST API 통신을 이용해 항공권 예약 내역, 호텔리스트 통신
-
 
 ---
 
