@@ -40,6 +40,9 @@
 - MySQL
 - bycrypt, PyJWT, cors-headers
 - Slack, Trello
+- Aquery Tool
+- Postman
+- Git & Github
 
 ### 추가설치 라이브러리
 
