@@ -3,7 +3,7 @@
 - 팀명 : myFakeTrip
 - 팀원 : 허덕형(Product Manager), 서수연, 김제형 , 김지안, 성규원, 황채영
 - 기간 : 2020년 11월 2일 ~ 2020년 11월 13일
-- frontend github :https://github.com/wecode-bootcamp-korea/13-MyFakeTrip-frontend
+- frontend github : https://github.com/wecode-bootcamp-korea/13-MyFakeTrip-frontend
 
 ## 프로젝트 소개
 
